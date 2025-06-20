@@ -21,6 +21,12 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
 
     public async Task<string> TranscribeAsync(string filePath)
     {
+        // Ensure BaseAddress is configured in case DI registration was missed or misconfigured.
+        if (_httpClient.BaseAddress is null)
+        {
+            _httpClient.BaseAddress = new Uri("https://api.openai.com/");
+        }
+
         await using var fileStream = File.OpenRead(filePath);
 
         using var content = new MultipartFormDataContent();
