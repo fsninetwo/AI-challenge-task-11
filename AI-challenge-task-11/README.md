@@ -36,6 +36,8 @@ Or with an environment variable:
 $Env:OpenAI__WhisperModel = "my-custom-model"
 ```
 
+Ensure `BaseUrl` is set inside `appsettings.json` (defaults to the official endpoint in the template but can be changed for proxies/self-hosted gateways).
+
 ## Build & Run
 
 From the repository root (where the `.sln` or project folder resides):

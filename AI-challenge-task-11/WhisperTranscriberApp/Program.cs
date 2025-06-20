@@ -29,9 +29,12 @@ internal class Program
                         throw new InvalidOperationException("OpenAI API key not configured (via appsettings 'OpenAI:ApiKey' or 'OPENAI_API_KEY' environment variable).");
                     }
 
-                    var baseUrl = string.IsNullOrWhiteSpace(options.BaseUrl)
-                        ? "https://api.openai.com/"
-                        : options.BaseUrl;
+                    if (string.IsNullOrWhiteSpace(options.BaseUrl))
+                    {
+                        throw new InvalidOperationException("OpenAI BaseUrl not configured (via appsettings 'OpenAI:BaseUrl').");
+                    }
+
+                    var baseUrl = options.BaseUrl!.EndsWith("/") ? options.BaseUrl : options.BaseUrl + "/";
 
                     client.BaseAddress = new Uri(baseUrl);
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);

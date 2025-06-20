@@ -11,7 +11,7 @@ public sealed class OpenAIOptions
     /// <summary>
     /// Base URL for the OpenAI platform (default "https://api.openai.com/").
     /// </summary>
-    public string? BaseUrl { get; set; } = "https://api.openai.com/";
+    public string? BaseUrl { get; set; }
 
     /// <summary>
     /// Secret API key used for authentication.
