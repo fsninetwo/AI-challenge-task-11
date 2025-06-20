@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text;
 using WhisperTranscriberApp.Services.Analytics;
 using WhisperTranscriberApp.Services.Summarization;
 using WhisperTranscriberApp.Services.Transcription;
@@ -26,23 +27,53 @@ public class TranscriptionRunner
 
     public async Task ExecuteAsync(string[] args, CancellationToken cancellationToken = default)
     {
-        var filePath = args.Length > 0 ? args[0] : null;
-        if (string.IsNullOrWhiteSpace(filePath))
+        Console.OutputEncoding = Encoding.UTF8;
+        ShowBanner();
+
+        // If file path argument provided, process single file then exit.
+        if (args.Length > 0)
         {
-            Console.Write("Enter path to audio file: ");
-            filePath = Console.ReadLine() ?? string.Empty;
+            await ProcessFileAsync(args[0], cancellationToken);
+            return;
         }
 
-        filePath = filePath.Trim('"'); // remove quotes if pasted
+        // Interactive loop
+        while (true)
+        {
+            Console.Write("Enter path to audio file (or 'exit' to quit): ");
+            var input = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (string.Equals(input, "exit", StringComparison.OrdinalIgnoreCase))
+                break;
+            if (string.Equals(input, "help", StringComparison.OrdinalIgnoreCase))
+            {
+                ShowHelp();
+                continue;
+            }
+            if (string.IsNullOrWhiteSpace(input))
+                continue;
+
+            await ProcessFileAsync(input, cancellationToken);
+        }
+    }
+
+    private async Task ProcessFileAsync(string filePath, CancellationToken cancellationToken)
+    {
+        filePath = filePath.Trim('"');
 
         if (!File.Exists(filePath))
         {
-            Console.Error.WriteLine($"File '{filePath}' not found.");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"❌ File '{filePath}' not found.\n");
+            Console.ResetColor();
             return;
         }
 
         try
         {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Transcribing... please wait\n");
+            Console.ResetColor();
+
             string transcript = await _transcriber.TranscribeAsync(filePath);
             Console.WriteLine("\n================ TRANSCRIPTION =================\n");
             Console.WriteLine(transcript);
@@ -67,14 +98,40 @@ public class TranscriptionRunner
             Console.WriteLine("\n================================================\n");
 
             await _resultSaver.SaveAsync(filePath, transcript, summary, analytics, cancellationToken);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("✅ Processing complete!\n");
+            Console.ResetColor();
         }
         catch (OperationCanceledException)
         {
-            Console.Error.WriteLine("Operation was cancelled.");
+            Console.Error.WriteLine("Operation was cancelled.\n");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during transcription: {ex.Message}");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"❌ Error: {ex.Message}\n");
+            Console.ResetColor();
         }
+    }
+
+    private static void ShowBanner()
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("============================================");
+        Console.WriteLine("   WhisperTranscriberApp - Console Edition   ");
+        Console.WriteLine("============================================\n");
+        Console.ResetColor();
+        ShowHelp();
+    }
+
+    private static void ShowHelp()
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Commands:");
+        Console.ResetColor();
+        Console.WriteLine("  <path>   - transcribe the specified audio file");
+        Console.WriteLine("  help     - show this help");
+        Console.WriteLine("  exit     - quit the application\n");
     }
 } 
