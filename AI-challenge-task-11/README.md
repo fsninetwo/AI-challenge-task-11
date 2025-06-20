@@ -64,5 +64,7 @@ The console will output the transcription returned by OpenAI.
 * Swap the implementation of `IAudioTranscriber` with another provider without changing consumer code.
 * Chain additional processing (e.g., GPT summarization) after the transcription.
 
+The core CLI workflow now lives in `TranscriptionRunner` for improved separation of concerns. `Program.cs` simply wires services and delegates execution to this runner.
+
 ---
 MIT License 

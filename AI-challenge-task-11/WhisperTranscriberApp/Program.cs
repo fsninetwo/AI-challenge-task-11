@@ -38,28 +38,11 @@ internal class Program
                 });
 
                 services.AddTransient<IAudioTranscriber, OpenAIWhisperTranscriber>();
+                services.AddTransient<TranscriptionRunner>();
             })
             .Build();
 
-        var transcriber = host.Services.GetRequiredService<IAudioTranscriber>();
-
-        var filePath = args.Length > 0 ? args[0] : "CAR0004.mp3";
-
-        if (!File.Exists(filePath))
-        {
-            Console.Error.WriteLine($"File '{filePath}' not found.");
-            return;
-        }
-
-        try
-        {
-            string transcript = await transcriber.TranscribeAsync(filePath);
-            Console.WriteLine("----- Transcript -----");
-            Console.WriteLine(transcript);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during transcription: {ex.Message}");
-        }
+        var runner = host.Services.GetRequiredService<TranscriptionRunner>();
+        await runner.ExecuteAsync(args);
     }
 } 
