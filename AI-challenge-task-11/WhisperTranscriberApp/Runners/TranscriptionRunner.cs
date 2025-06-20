@@ -130,7 +130,7 @@ public class TranscriptionRunner
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Commands:");
         Console.ResetColor();
-        Console.WriteLine("  <path>   - transcribe the specified audio file");
+        Console.WriteLine("  <path>   - transcribe the specified audio file (any common audio format)");
         Console.WriteLine("  help     - show this help");
         Console.WriteLine("  exit     - quit the application\n");
     }

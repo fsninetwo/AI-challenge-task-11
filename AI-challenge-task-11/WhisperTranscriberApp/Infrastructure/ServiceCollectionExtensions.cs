@@ -15,9 +15,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOpenAIHttpClients(this IServiceCollection services)
     {
-        services.AddHttpClient<OpenAIWhisperTranscriber>(ConfigureClient);
-        services.AddHttpClient<OpenAIGptSummarizer>(ConfigureClient);
-        services.AddHttpClient<OpenAIAnalyticsExtractor>(ConfigureClient);
+        // Register typed clients for each service so that they receive a HttpClient
+        // instance whose BaseAddress and Bearer token are properly configured.
+        services.AddHttpClient<IAudioTranscriber, OpenAIWhisperTranscriber>(ConfigureClient);
+        services.AddHttpClient<ISummarizer, OpenAIGptSummarizer>(ConfigureClient);
+        services.AddHttpClient<IAnalyticsExtractor, OpenAIAnalyticsExtractor>(ConfigureClient);
         return services;
     }
 
@@ -46,13 +48,10 @@ public static class ServiceCollectionExtensions
         // Options
         services.Configure<OpenAIOptions>(configuration.GetSection(OpenAIOptions.SectionName));
 
-        // Typed HttpClients
+        // Typed HttpClients and core services
         services.AddOpenAIHttpClients();
 
-        // Core services
-        services.AddTransient<IAudioTranscriber, OpenAIWhisperTranscriber>();
-        services.AddTransient<ISummarizer, OpenAIGptSummarizer>();
-        services.AddTransient<IAnalyticsExtractor, OpenAIAnalyticsExtractor>();
+        // Result saver does not need an HTTP client
         services.AddTransient<IResultSaver, MarkdownResultSaver>();
 
         // Runner

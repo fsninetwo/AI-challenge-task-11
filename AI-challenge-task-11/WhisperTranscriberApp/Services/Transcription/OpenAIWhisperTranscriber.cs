@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using WhisperTranscriberApp.Options;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace WhisperTranscriberApp.Services.Transcription;
 
@@ -10,6 +11,7 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
 {
     private readonly HttpClient _httpClient;
     private readonly string _model;
+    private static readonly FileExtensionContentTypeProvider _mimeProvider = new();
 
     public OpenAIWhisperTranscriber(HttpClient httpClient, IOptions<OpenAIOptions> options)
     {
@@ -43,14 +45,30 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
     // Returns the IANA media type for the given audio file path.
     private static string GetMimeType(string path)
     {
+        // Try to get the MIME type from the built-in provider which contains
+        // hundreds of mappings (far more than our previous hard-coded list).
+        if (_mimeProvider.TryGetContentType(path, out var mimeType) && !string.IsNullOrWhiteSpace(mimeType))
+        {
+            // The provider returns "video/mp4" for .mp4 which the Whisper endpoint
+            // also accepts for audio. However, for consistency we normalise common
+            // video/* results to the corresponding audio/* variant because the
+            // HTTP spec doesn't forbid this and OpenAI's examples use audio/*.
+            if (mimeType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+            {
+                mimeType = "audio/" + mimeType[6..];
+            }
+
+            return mimeType;
+        }
+
+        // Fall back to the original minimal set for a few audio-specific types
+        // that the provider might not include yet, then finally octet-stream.
         var ext = Path.GetExtension(path).ToLowerInvariant();
         return ext switch
         {
-            ".mp3" or ".mpeg" => "audio/mpeg",
-            ".wav" => "audio/wav",
             ".flac" => "audio/flac",
+            ".m4a" => "audio/mp4",
             ".ogg" or ".oga" => "audio/ogg",
-            ".m4a" or ".mp4" => "audio/mp4",
             ".aac" => "audio/aac",
             ".webm" => "audio/webm",
             _ => "application/octet-stream"

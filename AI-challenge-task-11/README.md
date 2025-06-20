@@ -47,10 +47,10 @@ cd WhisperTranscriberApp
 
 dotnet restore
 
-dotnet run -- "../CAR0004.mp3"   # or any other audio file path
+dotnet run -- "../CAR0004.mp3"   # or any other common audio file path
 ```
 
-If no argument is provided, the application defaults to `CAR0004.mp3` in the repository root.
+If no argument is provided, the application defaults to `CAR0004.mp3` in the repository root. The app supports any common music/audio format (e.g., MP3, WAV, FLAC, OGG, M4A, AAC, etc.).
 
 The console will output the transcription returned by OpenAI.
 
