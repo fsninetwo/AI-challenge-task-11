@@ -1,13 +1,32 @@
 using WhisperTranscriberApp.Services.Analytics;
+using Microsoft.Extensions.Options;
+using WhisperTranscriberApp.Options;
 
 namespace WhisperTranscriberApp.Services.Output;
 
 public class MarkdownResultSaver : IResultSaver
 {
+    private readonly string _outputDir;
+
+    public MarkdownResultSaver(IOptions<OutputOptions> outputOptions)
+    {
+        var configured = outputOptions.Value.Directory;
+
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            configured = "Transcripts";
+        }
+
+        _outputDir = Path.IsPathRooted(configured)
+            ? configured
+            : Path.Combine(AppContext.BaseDirectory, configured);
+
+        Directory.CreateDirectory(_outputDir);
+    }
+
     public async Task SaveAsync(string audioFilePath, string transcript, string summary, AnalyticsData analytics, CancellationToken cancellationToken = default)
     {
-        var outputDir = Path.Combine(AppContext.BaseDirectory, "Transcripts");
-        Directory.CreateDirectory(outputDir);
+        var outputDir = _outputDir;
 
         var safeBaseName = Path.GetFileNameWithoutExtension(audioFilePath);
         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");

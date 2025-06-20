@@ -88,5 +88,29 @@ WhisperTranscriberApp/
 
 Each service area lives in its own namespace (`WhisperTranscriberApp.Services.*`) to keep responsibilities clearly separated.
 
+### Controlling output location
+
+Result markdown files are saved to the folder specified by the `Output:Directory` setting (in `appsettings.json` or an environment variable). The value can be absolute or relative to the application binaries. Example:
+
+```json
+{
+  "Output": {
+    "Directory": "Transcripts"  // default relative path
+  }
+}
+```
+
+Override via environment variable on Windows PowerShell:
+
+```powershell
+$Env:Output__Directory = "D:\MyResults"
+```
+
+On Linux/macOS:
+
+```bash
+export Output__Directory="/home/user/results"
+```
+
 ---
 MIT License 
