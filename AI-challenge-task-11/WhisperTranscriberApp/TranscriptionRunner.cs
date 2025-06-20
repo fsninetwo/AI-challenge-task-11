@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Linq;
 
 namespace WhisperTranscriberApp;
 
@@ -37,22 +38,27 @@ public class TranscriptionRunner
         try
         {
             string transcript = await _transcriber.TranscribeAsync(filePath);
-            Console.WriteLine("----- Transcript -----");
+            Console.WriteLine("\n================ TRANSCRIPTION =================\n");
             Console.WriteLine(transcript);
 
-            Console.WriteLine("\n----- Summary -----");
+            Console.WriteLine("\n================ SUMMARY =======================\n");
             var summary = await _summarizer.SummarizeAsync(transcript, cancellationToken);
             Console.WriteLine(summary);
 
-            Console.WriteLine("\n----- Analytics -----");
+            Console.WriteLine("\n================ ANALYTICS =====================\n");
             var analytics = await _analytics.ExtractAnalyticsAsync(transcript, cancellationToken);
-            Console.WriteLine($"Total words: {analytics.WordCount}");
-            Console.WriteLine($"Speaking speed: {analytics.SpeakingSpeedWpm} WPM");
-            Console.WriteLine("Frequently mentioned topics:");
-            foreach (var tp in analytics.FrequentlyMentionedTopics)
+            Console.WriteLine($"Total words        : {analytics.WordCount}");
+            Console.WriteLine($"Speaking speed (WPM): {analytics.SpeakingSpeedWpm:F2}\n");
+
+            if (analytics.FrequentlyMentionedTopics.Any())
             {
-                Console.WriteLine($" • {tp.Topic}: {tp.Mentions}");
+                Console.WriteLine("Top frequently mentioned topics (topic : mentions)");
+                foreach (var tp in analytics.FrequentlyMentionedTopics.OrderByDescending(t => t.Mentions))
+                {
+                    Console.WriteLine($" - {tp.Topic,-25} : {tp.Mentions}");
+                }
             }
+            Console.WriteLine("\n================================================\n");
         }
         catch (OperationCanceledException)
         {
