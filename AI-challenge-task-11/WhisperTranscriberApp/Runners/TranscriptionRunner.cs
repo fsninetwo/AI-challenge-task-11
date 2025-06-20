@@ -63,7 +63,7 @@ public class TranscriptionRunner
         if (!File.Exists(filePath))
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ File '{filePath}' not found.\n");
+            Console.WriteLine($"❌ File '{filePath}' not found.\nType 'help' for usage instructions.\n");
             Console.ResetColor();
             return;
         }
@@ -110,7 +110,7 @@ public class TranscriptionRunner
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ Error: {ex.Message}\n");
+            Console.WriteLine($"❌ Error: {ex.Message}\nType 'help' for usage instructions.\n");
             Console.ResetColor();
         }
     }
