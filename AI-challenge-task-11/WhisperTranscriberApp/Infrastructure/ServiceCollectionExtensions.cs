@@ -6,6 +6,7 @@ using WhisperTranscriberApp.Services.Analytics;
 using WhisperTranscriberApp.Services.Summarization;
 using WhisperTranscriberApp.Services.Transcription;
 using Microsoft.Extensions.Configuration;
+using WhisperTranscriberApp.Runners;
 
 namespace WhisperTranscriberApp.Infrastructure;
 
