@@ -2,8 +2,9 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using WhisperTranscriberApp.Options;
 
-namespace WhisperTranscriberApp;
+namespace WhisperTranscriberApp.Services.Transcription;
 
 public class OpenAIWhisperTranscriber : IAudioTranscriber
 {
@@ -13,7 +14,7 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
     public OpenAIWhisperTranscriber(HttpClient httpClient, IOptions<OpenAIOptions> options)
     {
         _httpClient = httpClient;
-        _model = string.IsNullOrWhiteSpace(options.Value.WhisperModel) ? "whisper-1" : options.Value.WhisperModel;
+        _model = string.IsNullOrWhiteSpace(options.Value.WhisperModel) ? "whisper-1" : options.Value.WhisperModel!;
     }
 
     public async Task<string> TranscribeAsync(string filePath)
@@ -22,15 +23,11 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
 
         using var content = new MultipartFormDataContent();
 
-        // Add the file as stream content
         var fileContent = new StreamContent(fileStream);
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/mpeg");
         content.Add(fileContent, "file", Path.GetFileName(filePath));
 
-        // Model parameter (can be configured via appsettings - defaults to whisper-1)
         content.Add(new StringContent(_model), "model");
-
-        // Optional: You can specify additional parameters like language, prompt, etc.
 
         using var response = await _httpClient.PostAsync("v1/audio/transcriptions", content);
         response.EnsureSuccessStatusCode();

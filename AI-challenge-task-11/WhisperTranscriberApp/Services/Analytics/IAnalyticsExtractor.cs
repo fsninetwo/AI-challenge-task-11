@@ -1,4 +1,4 @@
-namespace WhisperTranscriberApp;
+namespace WhisperTranscriberApp.Services.Analytics;
 
 public interface IAnalyticsExtractor
 {

@@ -1,8 +1,9 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using WhisperTranscriberApp.Options;
 
-namespace WhisperTranscriberApp;
+namespace WhisperTranscriberApp.Services.Summarization;
 
 public sealed class OpenAIGptSummarizer : ISummarizer
 {
@@ -12,9 +13,7 @@ public sealed class OpenAIGptSummarizer : ISummarizer
     public OpenAIGptSummarizer(HttpClient httpClient, IOptions<OpenAIOptions> options)
     {
         _httpClient = httpClient;
-        _chatModel = string.IsNullOrWhiteSpace(options.Value.ChatModel)
-            ? "gpt-3.5-turbo"
-            : options.Value.ChatModel;
+        _chatModel = string.IsNullOrWhiteSpace(options.Value.ChatModel) ? "gpt-3.5-turbo" : options.Value.ChatModel!;
     }
 
     public async Task<string> SummarizeAsync(string text, CancellationToken cancellationToken = default)
@@ -47,7 +46,6 @@ public sealed class OpenAIGptSummarizer : ISummarizer
     private class ChatCompletionResponse
     {
         [JsonPropertyName("choices")] public List<Choice> Choices { get; set; } = new();
-
         public class Choice
         {
             [JsonPropertyName("message")] public ChatMessage Message { get; set; } = default!;

@@ -2,8 +2,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
+using WhisperTranscriberApp.Options;
 
-namespace WhisperTranscriberApp;
+namespace WhisperTranscriberApp.Services.Analytics;
 
 public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
 {
@@ -13,13 +14,12 @@ public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
     public OpenAIAnalyticsExtractor(HttpClient httpClient, IOptions<OpenAIOptions> options)
     {
         _httpClient = httpClient;
-        _chatModel = string.IsNullOrWhiteSpace(options.Value.ChatModel) ? "gpt-3.5-turbo" : options.Value.ChatModel;
+        _chatModel = string.IsNullOrWhiteSpace(options.Value.ChatModel) ? "gpt-3.5-turbo" : options.Value.ChatModel!;
     }
 
     public async Task<AnalyticsData> ExtractAnalyticsAsync(string transcript, CancellationToken cancellationToken = default)
     {
         var systemPrompt = "You are an AI assistant that analyzes transcripts and returns key statistics in JSON.";
-
         var userPrompt = "Given the following transcript, calculate:\n" +
                          "1. The total word count as 'word_count'.\n" +
                          "2. Speaking speed in words per minute as 'speaking_speed_wpm' (assume duration is equal to transcript length divided by average speaking speed of 150 WPM if not specified).\n" +
@@ -40,15 +40,12 @@ public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
 
         var raw = await response.Content.ReadAsStringAsync(cancellationToken);
         var completion = JsonSerializer.Deserialize<ChatCompletionResponse>(raw);
-        var content = completion?.Choices.FirstOrDefault()?.Message.Content ?? "";
-
-        // Parse returned content as JSON
+        var content = completion?.Choices.FirstOrDefault()?.Message.Content ?? string.Empty;
         var analytics = JsonSerializer.Deserialize<AnalyticsData>(content);
         if (analytics is null)
         {
             throw new InvalidOperationException("Failed to parse analytics JSON from model response.");
         }
-
         return analytics;
     }
 

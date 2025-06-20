@@ -1,11 +1,12 @@
-using System.Threading;
 using System.Linq;
+using WhisperTranscriberApp.Services.Analytics;
+using WhisperTranscriberApp.Services.Summarization;
+using WhisperTranscriberApp.Services.Transcription;
 
-namespace WhisperTranscriberApp;
+namespace WhisperTranscriberApp.Runners;
 
 /// <summary>
-/// Orchestrates the overall flow of the console application: parses arguments, validates the audio file, and outputs the transcript.
-/// Placing this logic in its own class keeps <c>Program.cs</c> minimal and improves testability.
+/// Orchestrates the overall CLI workflow: transcription, summarization, analytics.
 /// </summary>
 public class TranscriptionRunner
 {
@@ -20,15 +21,9 @@ public class TranscriptionRunner
         _analytics = analytics;
     }
 
-    /// <summary>
-    /// Executes the transcription workflow.
-    /// </summary>
-    /// <param name="args">Command-line arguments.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task ExecuteAsync(string[] args, CancellationToken cancellationToken = default)
     {
         var filePath = args.Length > 0 ? args[0] : "CAR0004.mp3";
-
         if (!File.Exists(filePath))
         {
             Console.Error.WriteLine($"File '{filePath}' not found.");

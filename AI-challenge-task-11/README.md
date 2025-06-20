@@ -72,5 +72,21 @@ After transcribing, the app now leverages a GPT model (configurable via `OpenAI:
 
 The app also extracts analytics (word count, speaking speed, frequent topics) using GPT and displays them after the summary.
 
+## Project structure
+
+```
+WhisperTranscriberApp/
+  Options/              # Configuration POCOs
+  Services/
+    Transcription/      # Audio transcription services and contracts
+    Summarization/      # GPT summarization services and contracts
+    Analytics/          # Analytics extraction services and contracts
+  Runners/              # Application entry workflow(s)
+  Program.cs            # Composition root
+  appsettings.json      # Runtime configuration
+```
+
+Each service area lives in its own namespace (`WhisperTranscriberApp.Services.*`) to keep responsibilities clearly separated.
+
 ---
 MIT License 
