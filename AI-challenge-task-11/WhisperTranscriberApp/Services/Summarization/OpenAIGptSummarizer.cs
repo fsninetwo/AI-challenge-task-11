@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using WhisperTranscriberApp.Options;
+using WhisperTranscriberApp.Models;
 
 namespace WhisperTranscriberApp.Services.Summarization;
 
@@ -33,22 +34,5 @@ public sealed class OpenAIGptSummarizer : ISummarizer
         return completion?.Choices.FirstOrDefault()?.Message.Content.Trim() ?? string.Empty;
     }
 
-    private record ChatCompletionRequest(
-        [property: JsonPropertyName("model")] string Model,
-        [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages,
-        [property: JsonPropertyName("temperature")] double Temperature = 0.7,
-        [property: JsonPropertyName("max_tokens")] int? MaxTokens = null);
-
-    private record ChatMessage(
-        [property: JsonPropertyName("role")] string Role,
-        [property: JsonPropertyName("content")] string Content);
-
-    private class ChatCompletionResponse
-    {
-        [JsonPropertyName("choices")] public List<Choice> Choices { get; set; } = new();
-        public class Choice
-        {
-            [JsonPropertyName("message")] public ChatMessage Message { get; set; } = default!;
-        }
-    }
+    // Nested models moved to ChatCompletionModels.cs
 } 
