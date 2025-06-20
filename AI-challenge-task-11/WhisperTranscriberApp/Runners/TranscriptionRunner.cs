@@ -23,7 +23,15 @@ public class TranscriptionRunner
 
     public async Task ExecuteAsync(string[] args, CancellationToken cancellationToken = default)
     {
-        var filePath = args.Length > 0 ? args[0] : "CAR0004.mp3";
+        var filePath = args.Length > 0 ? args[0] : null;
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            Console.Write("Enter path to audio file: ");
+            filePath = Console.ReadLine() ?? string.Empty;
+        }
+
+        filePath = filePath.Trim('"'); // remove quotes if pasted
+
         if (!File.Exists(filePath))
         {
             Console.Error.WriteLine($"File '{filePath}' not found.");
