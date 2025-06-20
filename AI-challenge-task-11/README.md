@@ -68,5 +68,7 @@ The console will output the transcription returned by OpenAI.
 
 The core CLI workflow now lives in `TranscriptionRunner` for improved separation of concerns. `Program.cs` simply wires services and delegates execution to this runner.
 
+After transcribing, the app now leverages a GPT model (configurable via `OpenAI:ChatModel`) to produce a concise summary, printed beneath the full transcript.
+
 ---
 MIT License 

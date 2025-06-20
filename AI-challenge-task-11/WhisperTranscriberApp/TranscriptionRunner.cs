@@ -9,10 +9,12 @@ namespace WhisperTranscriberApp;
 public class TranscriptionRunner
 {
     private readonly IAudioTranscriber _transcriber;
+    private readonly ISummarizer _summarizer;
 
-    public TranscriptionRunner(IAudioTranscriber transcriber)
+    public TranscriptionRunner(IAudioTranscriber transcriber, ISummarizer summarizer)
     {
         _transcriber = transcriber;
+        _summarizer = summarizer;
     }
 
     /// <summary>
@@ -35,6 +37,10 @@ public class TranscriptionRunner
             string transcript = await _transcriber.TranscribeAsync(filePath);
             Console.WriteLine("----- Transcript -----");
             Console.WriteLine(transcript);
+
+            Console.WriteLine("\n----- Summary -----");
+            var summary = await _summarizer.SummarizeAsync(transcript, cancellationToken);
+            Console.WriteLine(summary);
         }
         catch (OperationCanceledException)
         {

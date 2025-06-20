@@ -22,4 +22,9 @@ public sealed class OpenAIOptions
     /// Whisper model name (default "whisper-1").
     /// </summary>
     public string? WhisperModel { get; set; } = "whisper-1";
+
+    /// <summary>
+    /// GPT model to use for summarization (default "gpt-3.5-turbo").
+    /// </summary>
+    public string? ChatModel { get; set; } = "gpt-3.5-turbo";
 } 

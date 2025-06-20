@@ -40,7 +40,27 @@ internal class Program
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
                 });
 
+                services.AddHttpClient<OpenAIGptSummarizer>((provider, client) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+                    var apiKey = string.IsNullOrWhiteSpace(options.ApiKey)
+                        ? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+                        : options.ApiKey;
+                    if (string.IsNullOrWhiteSpace(apiKey))
+                    {
+                        throw new InvalidOperationException("OpenAI API key not configured.");
+                    }
+                    if (string.IsNullOrWhiteSpace(options.BaseUrl))
+                    {
+                        throw new InvalidOperationException("OpenAI BaseUrl not configured.");
+                    }
+                    var baseUrl = options.BaseUrl.EndsWith("/") ? options.BaseUrl : options.BaseUrl + "/";
+                    client.BaseAddress = new Uri(baseUrl);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                });
+
                 services.AddTransient<IAudioTranscriber, OpenAIWhisperTranscriber>();
+                services.AddTransient<ISummarizer, OpenAIGptSummarizer>();
                 services.AddTransient<TranscriptionRunner>();
             })
             .Build();
