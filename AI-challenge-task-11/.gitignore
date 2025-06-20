@@ -1,0 +1,77 @@
+# Build results
+bin/
+obj/
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# NuGet packages
+packages/
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# MSBuild-generated files
+*.dbmdl
+*.log
+
+# Others
+_ReSharper*/
+*.[Rr]e[Ss]harper/
+riderGlobalSettings/
+
+# DotCover
+*.dotCover
+
+# Backup & temporary files
+*.tmp
+*.bak
+*~
+*.swp
+
+# NuGet v3 files
+*.snupkg
+
+# Mac
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# Rider caches
+.idea/
+
+# Visual Studio auto-generated
+Generated_Code*/
+
+# Files built by Visual Studio
+*.exe
+*.dll
+*.pdb
+*.cache
+*.manifest
+*.application
+
+# Settings
+*.launchSettings.json
+
+# Test results
+TestResult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# npm packages (if any)
+node_modules/ 
