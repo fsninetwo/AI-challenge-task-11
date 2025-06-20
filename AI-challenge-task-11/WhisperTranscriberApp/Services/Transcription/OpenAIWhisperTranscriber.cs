@@ -24,7 +24,11 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
         using var content = new MultipartFormDataContent();
 
         var fileContent = new StreamContent(fileStream);
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/mpeg");
+        // Determine MIME type based on file extension so that a wide variety of
+        // audio formats (mp3, wav, flac, ogg, m4a, etc.) are accepted by the
+        // OpenAI Whisper endpoint. Falls back to application/octet-stream if
+        // the extension is unknown.
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(GetMimeType(filePath));
         content.Add(fileContent, "file", Path.GetFileName(filePath));
 
         content.Add(new StringContent(_model), "model");
@@ -34,6 +38,23 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
 
         var transcription = await response.Content.ReadFromJsonAsync<WhisperResponse>();
         return transcription?.Text ?? string.Empty;
+    }
+
+    // Returns the IANA media type for the given audio file path.
+    private static string GetMimeType(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext switch
+        {
+            ".mp3" or ".mpeg" => "audio/mpeg",
+            ".wav" => "audio/wav",
+            ".flac" => "audio/flac",
+            ".ogg" or ".oga" => "audio/ogg",
+            ".m4a" or ".mp4" => "audio/mp4",
+            ".aac" => "audio/aac",
+            ".webm" => "audio/webm",
+            _ => "application/octet-stream"
+        };
     }
 
     private class WhisperResponse
