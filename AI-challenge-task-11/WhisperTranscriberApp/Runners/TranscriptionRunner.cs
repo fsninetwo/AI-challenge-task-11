@@ -2,6 +2,7 @@ using System.Linq;
 using WhisperTranscriberApp.Services.Analytics;
 using WhisperTranscriberApp.Services.Summarization;
 using WhisperTranscriberApp.Services.Transcription;
+using WhisperTranscriberApp.Services.Output;
 
 namespace WhisperTranscriberApp.Runners;
 
@@ -13,12 +14,14 @@ public class TranscriptionRunner
     private readonly IAudioTranscriber _transcriber;
     private readonly ISummarizer _summarizer;
     private readonly IAnalyticsExtractor _analytics;
+    private readonly IResultSaver _resultSaver;
 
-    public TranscriptionRunner(IAudioTranscriber transcriber, ISummarizer summarizer, IAnalyticsExtractor analytics)
+    public TranscriptionRunner(IAudioTranscriber transcriber, ISummarizer summarizer, IAnalyticsExtractor analytics, IResultSaver resultSaver)
     {
         _transcriber = transcriber;
         _summarizer = summarizer;
         _analytics = analytics;
+        _resultSaver = resultSaver;
     }
 
     public async Task ExecuteAsync(string[] args, CancellationToken cancellationToken = default)
@@ -62,6 +65,8 @@ public class TranscriptionRunner
                 }
             }
             Console.WriteLine("\n================================================\n");
+
+            await _resultSaver.SaveAsync(filePath, transcript, summary, analytics, cancellationToken);
         }
         catch (OperationCanceledException)
         {

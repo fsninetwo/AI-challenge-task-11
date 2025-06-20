@@ -7,6 +7,7 @@ using WhisperTranscriberApp.Services.Summarization;
 using WhisperTranscriberApp.Services.Transcription;
 using Microsoft.Extensions.Configuration;
 using WhisperTranscriberApp.Runners;
+using WhisperTranscriberApp.Services.Output;
 
 namespace WhisperTranscriberApp.Infrastructure;
 
@@ -52,6 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAudioTranscriber, OpenAIWhisperTranscriber>();
         services.AddTransient<ISummarizer, OpenAIGptSummarizer>();
         services.AddTransient<IAnalyticsExtractor, OpenAIAnalyticsExtractor>();
+        services.AddTransient<IResultSaver, MarkdownResultSaver>();
 
         // Runner
         services.AddTransient<TranscriptionRunner>();
