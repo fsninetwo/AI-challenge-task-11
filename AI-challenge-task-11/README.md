@@ -70,5 +70,7 @@ The core CLI workflow now lives in `TranscriptionRunner` for improved separation
 
 After transcribing, the app now leverages a GPT model (configurable via `OpenAI:ChatModel`) to produce a concise summary, printed beneath the full transcript.
 
+The app also extracts analytics (word count, speaking speed, frequent topics) using GPT and displays them after the summary.
+
 ---
 MIT License 

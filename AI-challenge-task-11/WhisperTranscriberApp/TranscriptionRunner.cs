@@ -10,11 +10,13 @@ public class TranscriptionRunner
 {
     private readonly IAudioTranscriber _transcriber;
     private readonly ISummarizer _summarizer;
+    private readonly IAnalyticsExtractor _analytics;
 
-    public TranscriptionRunner(IAudioTranscriber transcriber, ISummarizer summarizer)
+    public TranscriptionRunner(IAudioTranscriber transcriber, ISummarizer summarizer, IAnalyticsExtractor analytics)
     {
         _transcriber = transcriber;
         _summarizer = summarizer;
+        _analytics = analytics;
     }
 
     /// <summary>
@@ -41,6 +43,16 @@ public class TranscriptionRunner
             Console.WriteLine("\n----- Summary -----");
             var summary = await _summarizer.SummarizeAsync(transcript, cancellationToken);
             Console.WriteLine(summary);
+
+            Console.WriteLine("\n----- Analytics -----");
+            var analytics = await _analytics.ExtractAnalyticsAsync(transcript, cancellationToken);
+            Console.WriteLine($"Total words: {analytics.WordCount}");
+            Console.WriteLine($"Speaking speed: {analytics.SpeakingSpeedWpm} WPM");
+            Console.WriteLine("Frequently mentioned topics:");
+            foreach (var tp in analytics.FrequentlyMentionedTopics)
+            {
+                Console.WriteLine($" • {tp.Topic}: {tp.Mentions}");
+            }
         }
         catch (OperationCanceledException)
         {
