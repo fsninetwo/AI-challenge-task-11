@@ -9,6 +9,10 @@ public sealed class OpenAIOptions
 
     public string? BaseUrl { get; set; }
     public string? ApiKey { get; set; }
-    public string? WhisperModel { get; set; } = "whisper-1";
-    public string? ChatModel { get; set; } = "gpt-3.5-turbo";
+    public string? WhisperModel { get; set; }
+    public string? ChatModel { get; set; }
+    /// <summary>
+    /// The temperature used for GPT chat completions. If null, each call will fall back to its own sensible default.
+    /// </summary>
+    public double? Temperature { get; set; }
 } 

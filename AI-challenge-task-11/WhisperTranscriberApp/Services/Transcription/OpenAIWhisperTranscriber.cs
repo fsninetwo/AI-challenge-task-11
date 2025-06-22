@@ -1,9 +1,9 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using WhisperTranscriberApp.Options;
 using Microsoft.AspNetCore.StaticFiles;
+using WhisperTranscriberApp.Models;
 
 namespace WhisperTranscriberApp.Services.Transcription;
 
@@ -79,11 +79,5 @@ public class OpenAIWhisperTranscriber : IAudioTranscriber
             ".webm" => "audio/webm",
             _ => "application/octet-stream"
         };
-    }
-
-    private class WhisperResponse
-    {
-        [JsonPropertyName("text")]
-        public string Text { get; set; } = string.Empty;
     }
 } 

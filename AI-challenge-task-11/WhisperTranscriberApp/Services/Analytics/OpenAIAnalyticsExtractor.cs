@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using WhisperTranscriberApp.Options;
+using WhisperTranscriberApp.Models;
 
 namespace WhisperTranscriberApp.Services.Analytics;
 
@@ -10,11 +11,13 @@ public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
 {
     private readonly HttpClient _httpClient;
     private readonly string _chatModel;
+    private readonly double _temperature;
 
     public OpenAIAnalyticsExtractor(HttpClient httpClient, IOptions<OpenAIOptions> options)
     {
         _httpClient = httpClient;
         _chatModel = string.IsNullOrWhiteSpace(options.Value.ChatModel) ? "gpt-3.5-turbo" : options.Value.ChatModel!;
+        _temperature = options.Value.Temperature ?? 0.2;
     }
 
     public async Task<AnalyticsData> ExtractAnalyticsAsync(string transcript, CancellationToken cancellationToken = default)
@@ -33,7 +36,7 @@ public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
                 new ChatMessage("system", systemPrompt),
                 new ChatMessage("user", userPrompt)
             },
-            temperature: 0.2);
+            Temperature: _temperature);
 
         using var response = await _httpClient.PostAsJsonAsync("v1/chat/completions", request, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -49,21 +52,5 @@ public sealed class OpenAIAnalyticsExtractor : IAnalyticsExtractor
         return analytics;
     }
 
-    private record ChatCompletionRequest(
-        [property: JsonPropertyName("model")] string Model,
-        [property: JsonPropertyName("messages")] IEnumerable<ChatMessage> Messages,
-        [property: JsonPropertyName("temperature")] double temperature = 0.7);
-
-    private record ChatMessage(
-        [property: JsonPropertyName("role")] string Role,
-        [property: JsonPropertyName("content")] string Content);
-
-    private class ChatCompletionResponse
-    {
-        [JsonPropertyName("choices")] public List<Choice> Choices { get; set; } = new();
-        public class Choice
-        {
-            [JsonPropertyName("message")] public ChatMessage Message { get; set; } = default!;
-        }
-    }
+    // Reuse shared chat completion models to avoid duplication.
 } 
