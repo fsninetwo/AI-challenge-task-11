@@ -12,6 +12,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         using IHost host = Host.CreateDefaultBuilder(args)
+            .AddMinimalConsoleLogging()
             .ConfigureServices((context, services) =>
             {
                 // Register all application services and HTTP clients via extension
